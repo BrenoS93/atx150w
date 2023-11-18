@@ -1,0 +1,2557 @@
+/* 
+baixe esse script cleo pra testar o sistema https://www.gtagarage.com/mods/show.php?id=22215
+H + numpad7 => Hitman level on all walk weapons (Silenced pistol, Desert Eagle, Shotgun, Spas-12, M4/Ak-47)
+H + numpad8 => Hitman level on all run weapons (colt45, tec9/uzi, sawn-off shotgun)
+H + numpad9 => Hitman level on All weapons.
+
+0 - WEAPONSKILL_PISTOL
+1 - WEAPONSKILL_PISTOL_SILENCED
+2 - WEAPONSKILL_DESERT_EAGLE
+3 - WEAPONSKILL_SHOTGUN
+4 - WEAPONSKILL_SAWNOFF_SHOTGUN
+5 - WEAPONSKILL_SPAS12_SHOTGUN
+6 - WEAPONSKILL_MICRO_UZI
+7 - WEAPONSKILL_MP5
+8 - WEAPONSKILL_AK47
+9 - WEAPONSKILL_M4
+10 - WEAPONSKILL_SNIPERRIFLE
+
+Hitman level report monitora as habilidades com as armas de cada jogador para reportar jogadores burlando o SetPlayerSkillLevel para usar auto C-Bug no servidor isso que você ta vendo é
+apenas um exemplo de uso das funções não copie e cole no seu gm tudo o que você ta vendo aqui leia e adapte isso a sua necessidade
+*/
+
+#include <a_samp>
+#include <sscanf2>
+#include <zcmd>
+
+// pegar o nome do jogador, mandar texto e passar o skill level pra variável usada no comando
+new string2[458], WeaponSkill[24][11], SkillLevel[24], reported[24], playername[24];
+
+// reporte o nível das habilidades para os jogadores
+new pistol_skill[24], silenced_skill[24], desert_skill[24], shotgun_skill[24], sawnoff_skill[24], spas12_skill[24], uzi_skill[24], mp5_skill[24], m4_skill[24], ak47_skill[24], sniper_skill[24];
+
+/*
+Lembrem que tirando a Sawnoff doze de cano serrado você só pode andar e atirar somente no Nível Hitman 999
+
+Pistola de duas mãos somente hitman 999 abaixo disso o jogador ta xitado
+Desert Eagle andar e atirar ao mesmo tempo somente nível hitman 999 abaixo disso o jogador ta xitado
+Ak47 e M4 arma no ombro 200 pra cima andar e atirar 999 abaixo disso o jogador ta xitado
+Shotgun arma no ombro 200 abaixo disso o jogador ta xitado
+Sawnoff duas mãos somente hitman
+MP5 arma no ombro 250 abaixo disso o jogador ta xitado, andar e atirar somente nível hitman
+UZI e TEC9 compartilham o mesmo id atirar com as duas mãos somente nível hitman
+*/
+
+#define skilldialog 0
+
+main()
+{
+}
+
+// testes inicar com 0
+
+public OnPlayerConnect(playerid)
+{
+GetPlayerName(playerid, playername, 24);
+reported[playerid] = 0;
+pistol_skill[playerid] = 0;
+silenced_skill[playerid] = 0;
+desert_skill[playerid] = 0;
+shotgun_skill[playerid] = 0;
+sawnoff_skill[playerid] = 0;
+spas12_skill[playerid] = 0;
+uzi_skill[playerid] = 0;
+mp5_skill[playerid] = 0;
+ak47_skill[playerid] = 0;
+m4_skill[playerid] = 0;
+sniper_skill[playerid] = 0;
+return 1;
+}
+
+public OnPlayerRequestClass(playerid, classid) return SetSpawnInfo(playerid, 0, 155, 825.7441, -1621.0062, 13.3828, 0.0, 24, 99, 29, 99, 31, 99);
+
+// SkillLevel é quem reporta o jogador com menos de 989 pra que a função de reportar o jogador possa funcionar
+
+public OnPlayerSpawn(playerid)
+{
+SkillLevel[playerid] = 0;
+SetPlayerSkillLevelEx(playerid, 0, 0);
+SetPlayerSkillLevelEx(playerid, 1, 0);
+SetPlayerSkillLevelEx(playerid, 2, 0);
+SetPlayerSkillLevelEx(playerid, 3, 0);
+SetPlayerSkillLevelEx(playerid, 4, 0);
+SetPlayerSkillLevelEx(playerid, 5, 0);
+SetPlayerSkillLevelEx(playerid, 6, 0);
+SetPlayerSkillLevelEx(playerid, 7, 0);
+SetPlayerSkillLevelEx(playerid, 8, 0);
+SetPlayerSkillLevelEx(playerid, 9, 0);
+SetPlayerSkillLevelEx(playerid, 10, 0);
+return 1;
+}
+
+CMD:skillhelp(playerid, params[])
+{
+SendClientMessage(playerid, -1,"Lembrem que tirando a Sawnoff doze de cano serrado você só pode andar e atirar somente no Nível Hitman 999!");
+strcat(string2, "Como saber se o jogador abaixo de 998 esta xiando?\n");
+strcat(string2, "Pistola de duas mãos somente hitman 999 abaixo disso xitado!\n");
+strcat(string2, "Desert Eagle andar e atirar ao mesmo tempo somente hitman 999 abaixo disso xitado!\n");
+strcat(string2, "Ak47 e M4 arma no ombro 200 pra cima abaixo disso xitado!\n");
+strcat(string2, "Shotgun arma no ombro 200 abaixo disso xitado!\nSawnoff duas mãos somente hitman\n");
+strcat(string2, "MP5 arma no ombro 250 abaixo disso xitado!\n");
+strcat(string2, "UZI e TEC9 compartilham o mesmo id atirar com as duas mãos somente nível hitman");
+ShowPlayerDialog(playerid, skilldialog, DIALOG_STYLE_MSGBOX, "Informações", string2, "Fechar", "");
+return 1;
+}
+
+// testes
+
+CMD:s0(playerid, params[])
+{
+SkillLevel[playerid] = 0;
+SetPlayerSkillLevelEx(playerid, 0, 0);
+SetPlayerSkillLevelEx(playerid, 1, 0);
+SetPlayerSkillLevelEx(playerid, 2, 0);
+SetPlayerSkillLevelEx(playerid, 3, 0);
+SetPlayerSkillLevelEx(playerid, 4, 0);
+SetPlayerSkillLevelEx(playerid, 5, 0);
+SetPlayerSkillLevelEx(playerid, 6, 0);
+SetPlayerSkillLevelEx(playerid, 7, 0);
+SetPlayerSkillLevelEx(playerid, 8, 0);
+SetPlayerSkillLevelEx(playerid, 9, 0);
+SetPlayerSkillLevelEx(playerid, 10, 0);
+return 1;
+}
+CMD:s100(playerid, params[])
+{
+SkillLevel[playerid] = 100;
+SetPlayerSkillLevelEx(playerid, 0, 100);
+SetPlayerSkillLevelEx(playerid, 1, 100);
+SetPlayerSkillLevelEx(playerid, 2, 100);
+SetPlayerSkillLevelEx(playerid, 3, 100);
+SetPlayerSkillLevelEx(playerid, 4, 100);
+SetPlayerSkillLevelEx(playerid, 5, 100);
+SetPlayerSkillLevelEx(playerid, 6, 100);
+SetPlayerSkillLevelEx(playerid, 7, 100);
+SetPlayerSkillLevelEx(playerid, 8, 100);
+SetPlayerSkillLevelEx(playerid, 9, 100);
+SetPlayerSkillLevelEx(playerid, 10, 100);
+
+// use o comando /playerskill em outro jogador
+
+pistol_skill[playerid] = 100;
+silenced_skill[playerid] = 100;
+desert_skill[playerid] = 100;
+shotgun_skill[playerid] = 100;
+sawnoff_skill[playerid] = 100;
+spas12_skill[playerid] = 100;
+uzi_skill[playerid] = 100;
+mp5_skill[playerid] = 100;
+ak47_skill[playerid] = 100;
+m4_skill[playerid] = 100;
+sniper_skill[playerid] = 100;
+return 1;
+}
+CMD:s200(playerid, params[])
+{
+SkillLevel[playerid] = 200;
+SetPlayerSkillLevelEx(playerid, 0, 200);
+SetPlayerSkillLevelEx(playerid, 1, 200);
+SetPlayerSkillLevelEx(playerid, 2, 200);
+SetPlayerSkillLevelEx(playerid, 3, 200);
+SetPlayerSkillLevelEx(playerid, 4, 200);
+SetPlayerSkillLevelEx(playerid, 5, 200);
+SetPlayerSkillLevelEx(playerid, 6, 200);
+SetPlayerSkillLevelEx(playerid, 7, 200);
+SetPlayerSkillLevelEx(playerid, 8, 200);
+SetPlayerSkillLevelEx(playerid, 9, 200);
+SetPlayerSkillLevelEx(playerid, 10, 200);
+return 1;
+}
+CMD:s1000(playerid, params[])
+{
+SkillLevel[playerid] = 999;
+SetPlayerSkillLevelEx(playerid, 0, 999);
+SetPlayerSkillLevelEx(playerid, 1, 999);
+SetPlayerSkillLevelEx(playerid, 2, 999);
+SetPlayerSkillLevelEx(playerid, 3, 999);
+SetPlayerSkillLevelEx(playerid, 4, 999);
+SetPlayerSkillLevelEx(playerid, 5, 999);
+SetPlayerSkillLevelEx(playerid, 6, 999);
+SetPlayerSkillLevelEx(playerid, 7, 999);
+SetPlayerSkillLevelEx(playerid, 8, 999);
+SetPlayerSkillLevelEx(playerid, 9, 999);
+SetPlayerSkillLevelEx(playerid, 10, 999);
+return 1;
+}
+
+CMD:uparskill(playerid, params[])
+{
+SetPlayerSkillLevelEx(playerid, 0, SkillLevel[playerid]++);
+format(string2, sizeof (string2), "colt45 skill %d", SkillLevel[playerid]);
+SendClientMessage(playerid, -1, string2);
+return 1;
+}
+
+// vai mostrar o progresso do jogador com cada arma em sua mão
+
+CMD:skill(playerid, params[])
+{
+if(GetPlayerWeapon(playerid) == 22)
+{
+format(string2, sizeof (string2), "colt45 skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 23)
+{
+format(string2, sizeof (string2), "silenced skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 24)
+{
+format(string2, sizeof (string2), "desert skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 25)
+{
+format(string2, sizeof (string2), "shotgun skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 26)
+{
+format(string2, sizeof (string2), "swanoff skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 27)
+{
+format(string2, sizeof (string2), "shotspa skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 28)
+{
+format(string2, sizeof (string2), "uzi skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 29)
+{
+format(string2, sizeof (string2), "mp5 skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 30)
+{
+format(string2, sizeof (string2), "ak47 skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 31)
+{
+format(string2, sizeof (string2), "m4 skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+if(GetPlayerWeapon(playerid) == 34)
+{
+format(string2, sizeof (string2), "sniper skill %d", WeaponSkill[playerid]);
+SendClientMessage(playerid, -1, string2);
+}
+return 1;
+}
+
+CMD:setskill(playerid, params[])
+{
+new pid, wid, level;
+if(sscanf(params, "udd", pid, wid, level))
+{
+SendClientMessage(playerid,0xFFFF00FF,"/setskill [playerid] [weaponid] [level]");
+return 1;
+}
+SetPlayerSkillLevelEx(pid, wid, level);
+SkillLevel[pid] = level;
+return 1;
+}
+
+// mostra o estado geral das habilidades dele com a arma
+
+CMD:myskill(playerid, params[])
+{
+format(string2, sizeof (string2), "Seu nível de habilidade atual %d", SkillLevel[playerid]);
+SendClientMessage(playerid, -1, string2);
+return 1;
+}
+
+// reporta o estado atual das habilidades com as armas de cada jogador
+
+CMD:playerskill(playerid, params[])
+{
+new pid;
+if(sscanf(params, "u", pid))
+{
+SendClientMessage(playerid,0xFFFF00FF,"/playerskill [jogador id]");
+return 1;
+}
+GetPlayerName(pid, playername, 24);
+format(string2, sizeof (string2), "%s Pistol: %d Silenced: %d Desert: %d Shotgun: %d Sawnoff: %d Spas12: %d Uzi - Tec9: %d", playername, pistol_skill[pid], silenced_skill[pid], desert_skill[pid], shotgun_skill[pid], sawnoff_skill[pid], spas12_skill[pid], uzi_skill[pid]);
+SendClientMessage(playerid, -1, string2);
+format(string2, sizeof (string2), "mp5: %d ak47: %d m4: %d Sniper: %d", mp5_skill[pid], ak47_skill[pid], m4_skill[pid], sniper_skill[pid]);
+SendClientMessage(playerid, -1, string2);
+return 1;
+}
+
+forward reportarid(playerid);
+
+/* nunca use isso pra kickar / banir o jogador porque mesmo que ele não se mova ele ainda vai ser reportado apertando W A S D enquanto atira, e essa é a ideia por trás desse sistema
+os jogadores vão ser avisados e alguém tem que ficar de /tv monitorando a animação do ped armado pra ver se ta xitando ou não */
+
+public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
+{
+// o resto das armas será ignorado estas são as que importam pro sistema funcionar
+if(GetPlayerWeapon(playerid) == 22 || GetPlayerWeapon(playerid) == 23 || GetPlayerWeapon(playerid) == 24 || GetPlayerWeapon(playerid) == 25 || GetPlayerWeapon(playerid) == 27 || 
+GetPlayerWeapon(playerid) == 28 || GetPlayerWeapon(playerid) == 29 ||  GetPlayerWeapon(playerid) == 30 || GetPlayerWeapon(playerid) == 31 || GetPlayerWeapon(playerid) == 32 || 
+GetPlayerWeapon(playerid) == 34)
+{
+if(SkillLevel[playerid] < 998)
+{
+new Keys, ud, lr;
+GetPlayerKeys(playerid, Keys, ud, lr);
+// essa função será executada uma unica vez toda vez que o jogador entrar no servidor
+if(reported[playerid] == 0)
+{
+SetTimer("reportarid", 1000, false);
+if(ud == KEY_UP)
+{
+SendClientMessage(playerid, -1, "Reportado por sispeita de Weapon S Hack!");
+SendClientMessage(playerid, -1, "Você não pode atirar e se mover ao mesmo tempo!");
+reported[playerid] = 1;
+}
+if(ud == KEY_DOWN)
+{
+SendClientMessage(playerid, -1, "Reportado por sispeita de Weapon S Hack!");
+SendClientMessage(playerid, -1, "Você não pode atirar e se mover ao mesmo tempo!");
+reported[playerid] = 1;
+}
+if(lr == KEY_LEFT)
+{
+SendClientMessage(playerid, -1, "Reportado por sispeita de Weapon S Hack!");
+SendClientMessage(playerid, -1, "Você não pode atirar e se mover ao mesmo tempo!");
+reported[playerid] = 1;
+}
+if(lr == KEY_RIGHT)
+{
+SendClientMessage(playerid, -1, "Reportado por sispeita de Weapon S Hack!");
+SendClientMessage(playerid, -1, "Você não pode atirar e se mover ao mesmo tempo!");
+reported[playerid] = 1;
+}
+}
+}
+}
+return 1;
+}
+
+public reportarid(playerid)
+{
+format(string2, sizeof (string2), "%s foi reportado por suspeita Weapon S Hack!", playername);
+SendClientMessageToAll( -1, string2);
+SendClientMessageToAll(-1, "Para comprovar recordem com /tv");
+return 1;
+}
+
+// Créditos: Nibblet
+// eu tava usando isso porque tinha esquecido como fazer o operador de soma funcionar remova se quiser quando for adaptar isso pro seu gm
+
+stock SetPlayerSkillLevelEx(playerid, skill, level)
+{
+if(IsPlayerConnected(playerid))
+{
+SetPlayerSkillLevel(playerid, skill, level);
+WeaponSkill[playerid][skill] = level;    
+}
+return 1;
+}
+
+stock GetPlayerSkillLevelEx(playerid, skill)
+{
+if(IsPlayerConnected(playerid))
+{
+return WeaponSkill[playerid][skill];
+}
+return 1;
+}
+
+// aqui você vai fazer a progressão do jogador do zero até 999
+
+new pdeaths[24]; 
+
+public OnPlayerDeath(playerid, killerid, reason)
+{
+if(killerid != INVALID_PLAYER_ID)
+{
+pdeaths[killerid]++;
+SkillLevel[killerid]++;
+
+// se você quiser que vá do zero até 999 deixe isso funcionando e bote no seu sistema de salvamento
+
+if(GetPlayerWeapon(killerid) == 22) SetPlayerSkillLevelEx(killerid, 0, SkillLevel[killerid]++); // pistol
+if(GetPlayerWeapon(killerid) == 23) SetPlayerSkillLevelEx(killerid, 1, SkillLevel[killerid]++); // silenced
+if(GetPlayerWeapon(killerid) == 24) SetPlayerSkillLevelEx(killerid, 2, SkillLevel[killerid]++); // desert
+if(GetPlayerWeapon(killerid) == 25) SetPlayerSkillLevelEx(killerid, 3, SkillLevel[killerid]++); // shotgun
+if(GetPlayerWeapon(killerid) == 26) SetPlayerSkillLevelEx(killerid, 4, SkillLevel[killerid]++); // sawnoff
+if(GetPlayerWeapon(killerid) == 27) SetPlayerSkillLevelEx(killerid, 5, SkillLevel[killerid]++); // spas12 - combat shotgun
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32) SetPlayerSkillLevelEx(killerid, 6, SkillLevel[killerid]++); // uzi - tec9
+if(GetPlayerWeapon(killerid) == 29) SetPlayerSkillLevelEx(killerid, 7, SkillLevel[killerid]++); // mp5
+if(GetPlayerWeapon(killerid) == 30) SetPlayerSkillLevelEx(killerid, 8, SkillLevel[killerid]++); // ak47
+if(GetPlayerWeapon(killerid) == 31) SetPlayerSkillLevelEx(killerid, 9, SkillLevel[killerid]++); // m4
+if(GetPlayerWeapon(killerid) == 34) SetPlayerSkillLevelEx(killerid, 10, SkillLevel[killerid]++); // sniper
+
+// aqui em cada arma ele tem que matar 36 jogadores pra chegar no nível hitman
+
+if(pdeaths[killerid] > 1)
+{
+SkillLevel[killerid] = 10;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 10); // 22
+pistol_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 10); // 23
+silenced_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 10); // 24
+desert_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 10); // 25
+shotgun_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 10); // 26
+sawnoff_skill[killerid] = 10; 
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 10); // 27
+spas12_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 10); // 28 - 32
+uzi_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 10); // 29
+mp5_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 10); // 30
+ak47_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 10); // 31
+m4_skill[killerid] = 10;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 10); // 34
+sniper_skill[killerid] = 10;
+}
+}
+//
+if(pdeaths[killerid] > 2)
+{
+SkillLevel[killerid] = 20;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 20); // 22 Pistol
+pistol_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 20); // 23 Silenced
+silenced_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 20); // 24 Desert
+desert_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 20); // 25 Shotgun
+shotgun_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 20); // 26 Sawnoff
+sawnoff_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 20); // 27 Spas12
+spas12_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 20); // 28 UZI / 32 Tec9
+uzi_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 20); // 29 MP5
+mp5_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 20); // 30 Ak47
+ak47_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 20); // 31 M4
+m4_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 20); // 34 Sniper
+sniper_skill[killerid] = 20;
+}
+}
+//
+if(pdeaths[killerid] > 3)
+{
+SkillLevel[killerid] = 30;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 30); // 22
+pistol_skill[killerid] = 30;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 30); // 23
+silenced_skill[killerid] = 20;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 30); // 24
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 30); // 25
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 30); // 26
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 30); // 27
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 30); // 28 - 32
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 10); // 29
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 30); // 30
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 30); // 31
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 30); // 34
+}
+}
+//
+if(pdeaths[killerid] > 4)
+{
+SkillLevel[killerid] = 40;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 40); // 22
+pistol_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 40); // 23
+silenced_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 40); // 24
+desert_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 40); // 25
+shotgun_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 40); // 26
+sawnoff_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 40); // 27
+spas12_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 40); // 28 - 32
+uzi_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 40); // 29
+mp5_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 40); // 30
+ak47_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 40); // 31
+m4_skill[killerid] = 40;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 40); // 34
+sniper_skill[killerid] = 40;
+}
+}
+//
+if(pdeaths[killerid] > 5)
+{
+SkillLevel[killerid] = 50;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 50); // 22
+pistol_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 50); // 23
+silenced_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 50); // 24
+desert_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 50); // 25
+shotgun_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 50); // 26
+sawnoff_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 50); // 27
+spas12_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 50); // 28
+uzi_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 50); // 29
+mp5_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 50); // 30
+ak47_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 50); // 31
+m4_skill[killerid] = 50;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 50); // 34
+sniper_skill[killerid] = 50;
+}
+}
+//
+if(pdeaths[killerid] > 6)
+{
+SkillLevel[killerid] = 60;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 60); // 22 Pistol
+pistol_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 60); // 23 Silenced
+silenced_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 60); // 24 Desert
+desert_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 60); // 25 Shotgun
+shotgun_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 60); // 26 Sawnoff
+sawnoff_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 60); // 27 Spas12
+spas12_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 60); // 28 UZI / Tec9
+uzi_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 60); // 29 MP5
+mp5_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 60); // 30 Ak47
+ak47_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 60); // 31 M4
+m4_skill[killerid] = 60;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 60); // 34 Sniper
+sniper_skill[killerid] = 60;
+}
+}
+//
+if(pdeaths[killerid] > 7)
+{
+SkillLevel[killerid] = 70;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 70); // 22 Pistol
+pistol_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 70); // 23 Silenced
+silenced_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 70); // 24 Desert
+desert_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 70); // 25 Shotgun
+shotgun_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 70); // 26 Sawnoff
+sawnoff_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 70); // 27 Spas12
+spas12_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 70); // 28 UZI / Tec9
+uzi_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 70); // 29 MP5
+mp5_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 70); // 30 Ak47
+ak47_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 70); // 31 M4
+m4_skill[killerid] = 70;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 70); // 34 Sniper
+sniper_skill[killerid] = 70;
+}
+}
+//
+if(pdeaths[killerid] > 8)
+{
+SkillLevel[killerid] = 80;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 80); // 22 Pistol
+pistol_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 80); // 23 Silenced
+silenced_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 80); // 24 Desert
+desert_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 80); // 25 Shotgun
+shotgun_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 80); // 26 Sawnoff
+sawnoff_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 80); // 27 Spas12
+spas12_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 80); // 28 UZI / Tec9
+uzi_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 80); // 29 MP5
+mp5_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 80); // 30 Ak47
+ak47_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 80); // 31 M4
+m4_skill[killerid] = 80;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 80); // 34 Sniper
+sniper_skill[killerid] = 80;
+}
+}
+//
+if(pdeaths[killerid] > 9)
+{
+SkillLevel[killerid] = 90;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 90); // 22 Pistol
+pistol_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 90); // 23 Silenced
+silenced_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 90); // 24 Desert
+desert_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 90); // 25 Shotgun
+shotgun_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 90); // 26 Sawnoff
+sawnoff_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 90); // 27 Spas12
+spas12_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 90); // 28 UZI / Tec9
+uzi_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 90); // 29 MP5
+mp5_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 90); // 30 Ak47
+ak47_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 90); // 31 M4
+m4_skill[killerid] = 90;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 90); // 34 Sniper
+sniper_skill[killerid] = 90;
+}
+}
+//
+if(pdeaths[killerid] > 10)
+{
+SkillLevel[killerid] = 100;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 100); // 22 Pistol
+pistol_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 100); // 23 Silenced
+silenced_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 100); // 24 Desert
+desert_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 100); // 25 Shotgun
+shotgun_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 100); // 26 Sawnoff
+sawnoff_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 100); // 27 Spas12
+spas12_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 100); // 28 UZI / Tec9
+uzi_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 100); // 29 MP5
+mp5_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 100); // 30 Ak47
+ak47_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 100); // 31 M4
+m4_skill[killerid] = 100;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 100); // 34 Sniper
+sniper_skill[killerid] = 100;
+}
+}
+//
+if(pdeaths[killerid] > 11)
+{
+SkillLevel[killerid] = 110;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 110); // 22 Pistol
+pistol_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 110); // 23 Silenced
+silenced_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 110); // 24 Desert
+desert_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 110); // 25 Shotgun
+shotgun_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 110); // 26 Sawnoff
+sawnoff_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 110); // 27 Spas12
+spas12_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 110); // 28 UZI / Tec9
+uzi_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 110); // 29 MP5
+mp5_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 110); // 30 Ak47
+ak47_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 110); // 31 M4
+m4_skill[killerid] = 110;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 110); // 34 Sniper
+sniper_skill[killerid] = 110;
+}
+}
+//
+if(pdeaths[killerid] > 12)
+{
+SkillLevel[killerid] = 120;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 120); // 22 Pistol
+pistol_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 120); // 23 Silenced
+silenced_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 120); // 24 Desert
+desert_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 120); // 25 Shotgun
+shotgun_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 120); // 26 Sawnoff
+sawnoff_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 120); // 27 Spas12
+spas12_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 120); // 28 UZI / Tec9
+uzi_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 120); // 29 MP5
+mp5_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 120); // 30 Ak47
+ak47_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 120); // 31 M4
+m4_skill[killerid] = 120;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 120); // 34 Sniper
+sniper_skill[killerid] = 120;
+}
+}
+//
+if(pdeaths[killerid] > 13)
+{
+SkillLevel[killerid] = 130;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 130); // 22 Pistol
+pistol_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 130); // 23 Silenced
+silenced_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 130); // 24 Desert
+desert_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 130); // 25 Shotgun
+shotgun_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 130); // 26 Sawnoff
+sawnoff_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 130); // 27 Spas12
+spas12_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 130); // 28 UZI / Tec9
+uzi_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 130); // 29 MP5
+mp5_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 130); // 30 Ak47
+ak47_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 130); // 31 M4
+m4_skill[killerid] = 130;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 130); // 34 Sniper
+sniper_skill[killerid] = 130;
+}
+}
+//
+if(pdeaths[killerid] > 14)
+{
+SkillLevel[killerid] = 140;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 140); // 22 Pistol
+pistol_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 140); // 23 Silenced
+silenced_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 140); // 24 Desert
+desert_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 140); // 25 Shotgun
+shotgun_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 140); // 26 Sawnoff
+sawnoff_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 140); // 27 Spas12
+spas12_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 140); // 28 UZI / Tec9
+uzi_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 140); // 29 MP5
+mp5_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 140); // 30 Ak47
+ak47_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 140); // 31 M4
+m4_skill[killerid] = 140;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 140); // 34 Sniper
+sniper_skill[killerid] = 140;
+}
+}
+//
+if(pdeaths[killerid] > 15)
+{
+SkillLevel[killerid] = 150;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 150); // 22 Pistol
+pistol_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 150); // 23 Silenced
+silenced_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 150); // 24 Desert
+desert_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 150); // 25 Shotgun
+shotgun_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 150); // 26 Sawnoff
+sawnoff_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 150); // 27 Spas12
+spas12_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 150); // 28 UZI / Tec9
+uzi_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 150); // 29 MP5
+mp5_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 150); // 30 Ak47
+ak47_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 150); // 31 M4
+m4_skill[killerid] = 150;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 150); // 34 Sniper
+sniper_skill[killerid] = 150;
+}
+}
+//
+if(pdeaths[killerid] > 16)
+{
+SkillLevel[killerid] = 160;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 160); // 22 Pistol
+pistol_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 160); // 23 Silenced
+silenced_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 160); // 24 Desert
+desert_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 160); // 25 Shotgun
+shotgun_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 160); // 26 Sawnoff
+sawnoff_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 160); // 27 Spas12
+spas12_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 160); // 28 UZI / Tec9
+uzi_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 160); // 29 MP5
+mp5_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 160); // 30 Ak47
+ak47_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 160); // 31 M4
+m4_skill[killerid] = 160;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 160); // 34 Sniper
+sniper_skill[killerid] = 160;
+}
+}
+//
+if(pdeaths[killerid] > 17)
+{
+SkillLevel[killerid] = 170;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 170); // 22 Pistol
+pistol_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 170); // 23 Silenced
+silenced_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 170); // 24 Desert
+desert_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 170); // 25 Shotgun
+shotgun_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 170); // 26 Sawnoff
+sawnoff_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 170); // 27 Spas12
+spas12_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 170); // 28 UZI / Tec9
+uzi_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 170); // 29 MP5
+mp5_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 170); // 30 Ak47
+ak47_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 170); // 31 M4
+m4_skill[killerid] = 170;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 170); // 34 Sniper
+sniper_skill[killerid] = 170;
+}
+}
+//
+if(pdeaths[killerid] > 18)
+{
+SkillLevel[killerid] = 180;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 180); // 22 Pistol
+pistol_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 180); // 23 Silenced
+silenced_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 180); // 24 Desert
+desert_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 180); // 25 Shotgun
+shotgun_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 180); // 26 Sawnoff
+sawnoff_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 180); // 27 Spas12
+spas12_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 180); // 28 UZI / Tec9
+uzi_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 180); // 29 MP5
+mp5_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 180); // 30 Ak47
+ak47_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 180); // 31 M4
+m4_skill[killerid] = 180;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 180); // 34 Sniper
+sniper_skill[killerid] = 180;
+}
+}
+//
+if(pdeaths[killerid] > 19)
+{
+SkillLevel[killerid] = 190;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 190); // 22 Pistol
+pistol_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 190); // 23 Silenced
+silenced_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 190); // 24 Desert
+desert_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 190); // 25 Shotgun
+shotgun_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 190); // 26 Sawnoff
+sawnoff_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 190); // 27 Spas12
+spas12_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 190); // 28 UZI / Tec9
+uzi_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 190); // 29 MP5
+mp5_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 190); // 30 Ak47
+ak47_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 190); // 31 M4
+m4_skill[killerid] = 190;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 190); // 34 Sniper
+sniper_skill[killerid] = 190;
+}
+}
+//
+if(pdeaths[killerid] > 20)
+{
+SkillLevel[killerid] = 200;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 200); // 22 Pistol
+pistol_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 200); // 23 Silenced
+silenced_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 200); // 24 Desert
+desert_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 200); // 25 Shotgun
+shotgun_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 200); // 26 Sawnoff
+sawnoff_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 200); // 27 Spas12
+spas12_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 200); // 28 UZI / Tec9
+uzi_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 200); // 29 MP5
+mp5_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 200); // 30 Ak47
+ak47_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 200); // 31 M4
+m4_skill[killerid] = 200;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 200); // 34 Sniper
+sniper_skill[killerid] = 200;
+}
+}
+//
+if(pdeaths[killerid] > 21)
+{
+SkillLevel[killerid] = 250;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 250); // 22 Pistol
+pistol_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 250); // 23 Silenced
+silenced_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 250); // 24 Desert
+desert_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 250); // 25 Shotgun
+shotgun_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 250); // 26 Sawnoff
+sawnoff_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 250); // 27 Spas12
+spas12_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 250); // 28 UZI / Tec9
+uzi_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 250); // 29 MP5
+mp5_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 250); // 30 Ak47
+ak47_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 250); // 31 M4
+m4_skill[killerid] = 250;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 250); // 34 Sniper
+sniper_skill[killerid] = 250;
+}
+}
+//
+if(pdeaths[killerid] > 22)
+{
+SkillLevel[killerid] = 300;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 300); // 22 Pistol
+pistol_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 300); // 23 Silenced
+silenced_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 300); // 24 Desert
+desert_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 300); // 25 Shotgun
+shotgun_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 300); // 26 Sawnoff
+sawnoff_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 300); // 27 Spas12
+spas12_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 300); // 28 UZI / Tec9
+uzi_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 300); // 29 MP5
+mp5_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 300); // 30 Ak47
+ak47_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 300); // 31 M4
+m4_skill[killerid] = 300;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 300); // 34 Sniper
+sniper_skill[killerid] = 300;
+}
+}
+//
+if(pdeaths[killerid] > 23)
+{
+SkillLevel[killerid] = 350;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 350); // 22 Pistol
+pistol_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 350); // 23 Silenced
+silenced_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 350); // 24 Desert
+desert_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 350); // 25 Shotgun
+shotgun_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 350); // 26 Sawnoff
+sawnoff_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 350); // 27 Spas12
+spas12_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 350); // 28 UZI / Tec9
+uzi_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 350); // 29 MP5
+mp5_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 350); // 30 Ak47
+ak47_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 350); // 31 M4
+m4_skill[killerid] = 350;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 350); // 34 Sniper
+sniper_skill[killerid] = 350;
+}
+}
+//
+if(pdeaths[killerid] > 24)
+{
+SkillLevel[killerid] = 400;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 400); // 22 Pistol
+pistol_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 400); // 23 Silenced
+silenced_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 400); // 24 Desert
+desert_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 400); // 25 Shotgun
+shotgun_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 400); // 26 Sawnoff
+sawnoff_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 400); // 27 Spas12
+spas12_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 400); // 28 UZI / Tec9
+uzi_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 400); // 29 MP5
+mp5_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 400); // 30 Ak47
+ak47_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 400); // 31 M4
+m4_skill[killerid] = 400;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 400); // 34 Sniper
+sniper_skill[killerid] = 400;
+}
+}
+//
+if(pdeaths[killerid] > 25)
+{
+SkillLevel[killerid] = 450;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 450); // 22 Pistol
+pistol_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 450); // 23 Silenced
+silenced_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 450); // 24 Desert
+desert_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 450); // 25 Shotgun
+shotgun_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 450); // 26 Sawnoff
+sawnoff_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 450); // 27 Spas12
+spas12_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 450); // 28 UZI / Tec9
+uzi_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 450); // 29 MP5
+mp5_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 450); // 30 Ak47
+ak47_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 450); // 31 M4
+m4_skill[killerid] = 450;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 450); // 34 Sniper
+sniper_skill[killerid] = 450;
+}
+}
+//
+if(pdeaths[killerid] > 26)
+{
+SkillLevel[killerid] = 500;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 500); // 22 Pistol
+pistol_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 500); // 23 Silenced
+silenced_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 500); // 24 Desert
+desert_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 500); // 25 Shotgun
+shotgun_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 500); // 26 Sawnoff
+sawnoff_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 500); // 27 Spas12
+spas12_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 500); // 28 UZI / Tec9
+uzi_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 500); // 29 MP5
+mp5_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 500); // 30 Ak47
+ak47_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 500); // 31 M4
+m4_skill[killerid] = 500;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 500); // 34 Sniper
+sniper_skill[killerid] = 500;
+}
+}
+//
+if(pdeaths[killerid] > 27)
+{
+SkillLevel[killerid] = 550;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 550); // 22 Pistol
+pistol_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 550); // 23 Silenced
+silenced_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 550); // 24 Desert
+desert_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 550); // 25 Shotgun
+shotgun_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 550); // 26 Sawnoff
+sawnoff_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 550); // 27 Spas12
+spas12_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 550); // 28 UZI / Tec9
+uzi_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 550); // 29 MP5
+mp5_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 550); // 30 Ak47
+ak47_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 550); // 31 M4
+m4_skill[killerid] = 550;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 550); // 34 Sniper
+sniper_skill[killerid] = 550;
+}
+}
+//
+if(pdeaths[killerid] > 28)
+{
+SkillLevel[killerid] = 600;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 600); // 22 Pistol
+pistol_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 600); // 23 Silenced
+silenced_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 600); // 24 Desert
+desert_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 600); // 25 Shotgun
+shotgun_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 600); // 26 Sawnoff
+sawnoff_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 600); // 27 Spas12
+spas12_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 600); // 28 UZI / Tec9
+uzi_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 600); // 29 MP5
+mp5_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 600); // 30 Ak47
+ak47_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 600); // 31 M4
+m4_skill[killerid] = 600;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 600); // 34 Sniper
+sniper_skill[killerid] = 600;
+}
+}
+//
+if(pdeaths[killerid] > 29)
+{
+SkillLevel[killerid] = 650;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 650); // 22 Pistol
+pistol_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 650); // 23 Silenced
+silenced_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 650); // 24 Desert
+desert_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 650); // 25 Shotgun
+shotgun_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 650); // 26 Sawnoff
+sawnoff_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 650); // 27 Spas12
+spas12_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 650); // 28 UZI / Tec9
+uzi_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 650); // 29 MP5
+mp5_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 650); // 30 Ak47
+ak47_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 650); // 31 M4
+m4_skill[killerid] = 650;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 650); // 34 Sniper
+sniper_skill[killerid] = 650;
+}
+}
+//
+if(pdeaths[killerid] > 30)
+{
+SkillLevel[killerid] = 700;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 700); // 22 Pistol
+pistol_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 700); // 23 Silenced
+silenced_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 700); // 24 Desert
+desert_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 700); // 25 Shotgun
+shotgun_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 700); // 26 Sawnoff
+sawnoff_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 700); // 27 Spas12
+spas12_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 700); // 28 UZI / Tec9
+uzi_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 700); // 29 MP5
+mp5_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 700); // 30 Ak47
+ak47_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 700); // 31 M4
+m4_skill[killerid] = 700;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 700); // 34 Sniper
+sniper_skill[killerid] = 700;
+}
+}
+//
+if(pdeaths[killerid] > 31)
+{
+SkillLevel[killerid] = 750;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 750); // 22 Pistol
+pistol_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 750); // 23 Silenced
+silenced_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 750); // 24 Desert
+desert_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 750); // 25 Shotgun
+shotgun_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 750); // 26 Sawnoff
+sawnoff_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 750); // 27 Spas12
+spas12_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 750); // 28 UZI / Tec9
+uzi_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 750); // 29 MP5
+mp5_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 750); // 30 Ak47
+ak47_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 750); // 31 M4
+m4_skill[killerid] = 750;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 750); // 34 Sniper
+sniper_skill[killerid] = 750;
+}
+}
+//
+if(pdeaths[killerid] > 32)
+{
+SkillLevel[killerid] = 800;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 800); // 22 Pistol
+pistol_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 800); // 23 Silenced
+silenced_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 800); // 24 Desert
+desert_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 800); // 25 Shotgun
+shotgun_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 800); // 26 Sawnoff
+sawnoff_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 800); // 27 Spas12
+spas12_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 800); // 28 UZI / Tec9
+uzi_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 800); // 29 MP5
+mp5_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 800); // 30 Ak47
+ak47_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 800); // 31 M4
+m4_skill[killerid] = 800;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 800); // 34 Sniper
+sniper_skill[killerid] = 800;
+}
+}
+//
+if(pdeaths[killerid] > 33)
+{
+SkillLevel[killerid] = 850;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 850); // 22 Pistol
+pistol_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 850); // 23 Silenced
+silenced_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 850); // 24 Desert
+desert_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 850); // 25 Shotgun
+shotgun_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 850); // 26 Sawnoff
+sawnoff_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 850); // 27 Spas12
+spas12_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 850); // 28 UZI / Tec9
+uzi_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 850); // 29 MP5
+mp5_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 850); // 30 Ak47
+ak47_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 850); // 31 M4
+m4_skill[killerid] = 850;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 850); // 34 Sniper
+sniper_skill[killerid] = 850;
+}
+}
+//
+if(pdeaths[killerid] > 34)
+{
+SkillLevel[killerid] = 900;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 900); // 22 Pistol
+pistol_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 900); // 23 Silenced
+silenced_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 900); // 24 Desert
+desert_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 900); // 25 Shotgun
+shotgun_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 900); // 26 Sawnoff
+sawnoff_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 900); // 27 Spas12
+spas12_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 900); // 28 UZI / Tec9
+uzi_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 900); // 29 MP5
+mp5_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 900); // 30 Ak47
+ak47_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 900); // 31 M4
+m4_skill[killerid] = 900;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 900); // 34 Sniper
+sniper_skill[killerid] = 900;
+}
+}
+//
+if(pdeaths[killerid] > 35)
+{
+SkillLevel[killerid] = 950;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 950); // 22 Pistol
+pistol_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 950); // 23 Silenced
+silenced_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 950); // 24 Desert
+desert_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 950); // 25 Shotgun
+shotgun_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 950); // 26 Sawnoff
+sawnoff_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 950); // 27 Spas12
+spas12_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 950); // 28 UZI / Tec9
+uzi_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 950); // 29 MP5
+mp5_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 950); // 30 Ak47
+ak47_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 950); // 31 M4
+m4_skill[killerid] = 950;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 950); // 34 Sniper
+sniper_skill[killerid] = 950;
+}
+}
+//
+if(pdeaths[killerid] > 36)
+{
+SkillLevel[killerid] = 999;
+if(GetPlayerWeapon(killerid) == 22)
+{
+SetPlayerSkillLevelEx(killerid, 0, 999); // 22 Pistol
+pistol_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 23)
+{
+SetPlayerSkillLevelEx(killerid, 1, 999); // 23 Silenced
+silenced_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 24)
+{
+SetPlayerSkillLevelEx(killerid, 2, 999); // 24 Desert
+desert_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 25)
+{
+SetPlayerSkillLevelEx(killerid, 3, 999); // 25 Shotgun
+shotgun_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 26)
+{
+SetPlayerSkillLevelEx(killerid, 4, 999); // 26 Sawnoff
+sawnoff_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 27)
+{
+SetPlayerSkillLevelEx(killerid, 5, 999); // 27 Spas12
+spas12_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 28 || GetPlayerWeapon(killerid) == 32)
+{
+SetPlayerSkillLevelEx(killerid, 6, 999); // 28 UZI / Tec9
+uzi_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 29)
+{
+SetPlayerSkillLevelEx(killerid, 7, 999); // 29 MP5
+mp5_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 30)
+{
+SetPlayerSkillLevelEx(killerid, 8, 999); // 30 Ak47
+ak47_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 31)
+{
+SetPlayerSkillLevelEx(killerid, 9, 999); // 31 M4
+m4_skill[killerid] = 999;
+}
+if(GetPlayerWeapon(killerid) == 34)
+{
+SetPlayerSkillLevelEx(killerid, 10, 999); // 34 Sniper
+sniper_skill[killerid] = 999;
+}
+}
+//
+}
+return 1;
+}
